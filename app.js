@@ -18,16 +18,17 @@ const allBoroughs = [
 ];
 
 function progressUI() {
-  const total = 8;
-  const percent = Math.round((step / total) * 100);
+  const total = 7;
+  const percent = Math.round((Math.min(step, total) / total) * 100);
 
   return `
     <div class="progress-wrapper">
-      <div>Step ${step} of ${total}</div>
+      <div class="progress-text">Step ${Math.min(step, total)} of ${total}</div>
       <div class="progress-bar">
         <div class="progress-fill" style="width:${percent}%"></div>
       </div>
-    </div>`;
+    </div>
+  `;
 }
 
 function rejectionScreen(title, message, extra = "") {
@@ -39,40 +40,87 @@ function rejectionScreen(title, message, extra = "") {
 
       ${extra ? `<div class="alert">${extra}</div>` : ""}
 
-      <p>If you believe your situation should still be considered, please contact us.</p>
+      <div style="margin-top:15px;">
+        <button class="btn secondary" onclick="ntact our team
+        </button>
+      </div>
 
-      <button class="btn secondary" onclick="window.location.href='mailto
+      <p class="reassurance" style="margin-top:10px;">
+        We are here to guide you — please reach out if you need support.
+      </p>
 
       <button class="back" onclick="reset()">← Start again</button>
-    </div>`;
+    </div>
+  `;
 }
 
 function render() {
   const el = document.getElementById("app");
 
-  // STEP 0 — BOROUGH
+  // ✅ FAIL STATES FIRST (CRITICAL)
+  if (step === "boroughFail") {
+    el.innerHTML = rejectionScreen(
+      "Support in your area is different",
+      `We don’t currently deliver AngelBox in ${answers.borough}.`,
+      "You can still find local support through our borough pages."
+    );
+    return;
+  }
+
+  if (step === "residencyFail") {
+    el.innerHTML = rejectionScreen(
+      "We may not be able to support at this stage",
+      "Some residency types fall outside our eligibility criteria.",
+      "These visa categories typically require higher financial support thresholds."
+    );
+    return;
+  }
+
+  if (step === "incomeFail") {
+    el.innerHTML = rejectionScreen(
+      "We may not be able to support at this stage",
+      "Our service prioritises families experiencing financial hardship.",
+      "Household income above £10,500 may fall outside our criteria."
+    );
+    return;
+  }
+
+  if (step === "dueDateFail") {
+    el.innerHTML = rejectionScreen(
+      "It may be a bit early to apply",
+      "Your baby is due in more than 2 months.",
+      "Applications may be placed on a waiting list until closer to your due date."
+    );
+    return;
+  }
+
+  if (step === "evidenceFail") {
+    el.innerHTML = rejectionScreen(
+      "We may not be able to proceed",
+      "We require evidence to assess and prioritise applications fairly."
+    );
+    return;
+  }
+
+  // ✅ STEP 0 — BOROUGH
   if (step === 0) {
     el.innerHTML = `
       <div class="card">
         <p>Which London borough do you live in?</p>
-
         <select id="borough">
           <option value="">Select borough</option>
           ${allBoroughs.map(b => `<option>${b}</option>`).join("")}
         </select>
-
         <button class="btn primary" onclick="nextBorough()">Continue</button>
       </div>`;
   }
 
-  // STEP 1 — RESIDENCY
+  // ✅ STEP 1 — RESIDENCY
   else if (step === 1) {
     el.innerHTML = `
       <div class="card">
         ${progressUI()}
-
-        <p>What is your current residency status in the UK?</p>
-
+        <p>What is your residency status in the UK?</p>
         <select id="residency">
           <option value="">Select</option>
           <option value="uk">UK citizen or settled</option>
@@ -83,20 +131,17 @@ function render() {
           <option value="spouse">Spouse visa</option>
           <option value="fiance">Fiancé visa</option>
         </select>
-
         <button class="btn primary" onclick="nextResidency()">Continue</button>
         <button class="back" onclick="back()">← Go back</button>
       </div>`;
   }
 
-  // STEP 2 — EMPLOYMENT
+  // ✅ STEP 2 — EMPLOYMENT
   else if (step === 2) {
     el.innerHTML = `
       <div class="card">
         ${progressUI()}
-
         <p>What is your current work situation?</p>
-
         <select id="employment">
           <option value="">Select</option>
           <option>Full-time</option>
@@ -105,50 +150,41 @@ function render() {
           <option>Contract work</option>
           <option>Not currently working</option>
         </select>
-
         <button class="btn primary" onclick="nextEmployment()">Continue</button>
         <button class="back" onclick="back()">← Go back</button>
       </div>`;
   }
 
-  // STEP 3 — INCOME
+  // ✅ STEP 3 — INCOME
   else if (step === 3) {
     el.innerHTML = `
       <div class="card">
         ${progressUI()}
-
         <p>Is your household income above £10,500 per year?</p>
-
         <button class="btn primary" onclick="handleIncome('no')">No</button>
         <button class="btn secondary" onclick="handleIncome('yes')">Yes</button>
-
         <button class="back" onclick="back()">← Go back</button>
       </div>`;
   }
 
-  // STEP 4 — BENEFITS
+  // ✅ STEP 4 — BENEFITS
   else if (step === 4) {
     el.innerHTML = `
       <div class="card">
         ${progressUI()}
-
         <p>Are you currently receiving benefits?</p>
-
         <button class="btn primary" onclick="handleBenefits('yes')">Yes</button>
         <button class="btn secondary" onclick="handleBenefits('no')">No</button>
-
         <button class="back" onclick="back()">← Go back</button>
       </div>`;
   }
 
-  // BENEFITS LIST
+  // ✅ BENEFITS LIST
   else if (step === "benefitsList") {
     el.innerHTML = `
       <div class="card">
         ${progressUI()}
-
         <p>Which benefits are you receiving?</p>
-
         <select id="benefits">
           <option value="">Select</option>
           <option>Universal Credit</option>
@@ -161,38 +197,31 @@ function render() {
           <option>DLA</option>
           <option>Other</option>
         </select>
-
         <button class="btn primary" onclick="saveBenefits()">Continue</button>
         <button class="back" onclick="back()">← Go back</button>
       </div>`;
   }
 
-  // STEP — DUE DATE
+  // ✅ STEP 5 — DUE DATE
   else if (step === 5) {
     el.innerHTML = `
       <div class="card">
         ${progressUI()}
-
         <p>When is your baby due (or date of birth)?</p>
-
         <input type="date" id="dueDate">
-
         <button class="btn primary" onclick="handleDueDate()">Continue</button>
         <button class="back" onclick="back()">← Go back</button>
       </div>`;
   }
 
-  // STEP — EVIDENCE
+  // ✅ STEP 6 — EVIDENCE
   else if (step === 6) {
     el.innerHTML = `
       <div class="card">
         ${progressUI()}
-
-        <p>Can you provide evidence if required?</p>
-
+        <p>Are you able to provide evidence if required?</p>
         <button class="btn primary" onclick="handleEvidence('yes')">Yes</button>
         <button class="btn secondary" onclick="handleEvidence('no')">No</button>
-
         <button class="back" onclick="back()">← Go back</button>
       </div>`;
   }
@@ -202,9 +231,7 @@ function render() {
 
     const eligible =
       supportedBoroughs.includes(answers.borough) &&
-      answers.residency &&
       answers.income === "no" &&
-      answers.director !== "yes" &&
       answers.childTiming === "eligible" &&
       answers.evidence === "yes";
 
@@ -215,10 +242,7 @@ function render() {
           eligible
           ? `
           <div class="icon">✅</div>
-
-          <h3 class="result-success">
-            You may be eligible for AngelBox support
-          </h3>
+          <h3 class="result-success">You may be eligible for AngelBox support</h3>
 
           <p>
             Based on the information you’ve provided, your application meets our initial eligibility criteria.
@@ -239,12 +263,11 @@ function render() {
         }
 
         <button class="back" onclick="reset()">← Start again</button>
-
       </div>`;
   }
 }
 
-/* HANDLERS */
+/* ✅ HANDLERS */
 
 function nextBorough() {
   const val = document.getElementById("borough").value;
@@ -253,14 +276,11 @@ function nextBorough() {
   answers.borough = val;
 
   if (!supportedBoroughs.includes(val)) {
-    document.getElementById("app").innerHTML = rejectionScreen(
-      "Support in your area is different",
-      `We don’t currently deliver AngelBox in ${val}.`
-    );
-    return;
+    step = "boroughFail";
+  } else {
+    step = 1;
   }
 
-  step = 1;
   render();
 }
 
@@ -269,15 +289,13 @@ function nextResidency() {
   answers.residency = val;
 
   const excluded = ["student","visitor","spouse","fiance"];
+
   if (excluded.includes(val)) {
-    document.getElementById("app").innerHTML = rejectionScreen(
-      "We may not be able to support",
-      "Some visa conditions require higher income support than our threshold."
-    );
-    return;
+    step = "residencyFail";
+  } else {
+    step++;
   }
 
-  step++;
   render();
 }
 
@@ -290,15 +308,9 @@ function nextEmployment() {
 function handleIncome(val) {
   answers.income = val;
 
-  if (val === "yes") {
-    document.getElementById("app").innerHTML = rejectionScreen(
-      "We may not be able to support",
-      "Our service prioritises households below £10,500 income."
-    );
-    return;
-  }
+  if (val === "yes") step = "incomeFail";
+  else step++;
 
-  step++;
   render();
 }
 
@@ -319,40 +331,33 @@ function saveBenefits() {
 
 function handleDueDate() {
   const input = document.getElementById("dueDate").value;
+  if (!input) return alert("Please enter a date");
+
   const due = new Date(input);
   const today = new Date();
 
   const diff = (due - today) / (1000 * 60 * 60 * 24);
 
   if (diff > 60) {
-    document.getElementById("app").innerHTML = rejectionScreen(
-      "It may be too early to apply",
-      "Applications are prioritised closer to your due date."
-    );
-    return;
+    step = "dueDateFail";
+  } else {
+    answers.childTiming = "eligible";
+    step++;
   }
 
-  answers.childTiming = "eligible";
-  step++;
   render();
 }
 
 function handleEvidence(val) {
   answers.evidence = val;
 
-  if (val === "no") {
-    document.getElementById("app").innerHTML = rejectionScreen(
-      "We may not be able to proceed",
-      "We require evidence to assess applications fairly."
-    );
-    return;
-  }
+  if (val === "no") step = "evidenceFail";
+  else step++;
 
-  step++;
   render();
 }
 
 function back() { step--; render(); }
-function reset() { step=0; answers={}; render(); }
+function reset() { step = 0; answers = {}; render(); }
 
 render();

@@ -1,38 +1,140 @@
-let step=0,answers={};
 
-function next(){step++;render();}
-function back(){step--;render();}
-function reset(){step=0;answers={};render();}
+let step = 0;
+let answers = {};
 
-function render(){
- const el=document.getElementById('app');
- 
- if(step===0){
-  el.innerHTML=`<div class='card'>
-    <p>Which borough do you live in?</p>
-    <select id='b'><option value=''>Select</option><option>Camden</option><option>Westminster</option></select>
-    <button class='btn primary' onclick='next()'>Continue</button>
-  </div>`;
- }
- 
- else if(step===1){
-  el.innerHTML=`<div class='card'>
-    <p>What is your residency status?</p>
-    <select id='r'><option>UK</option><option>Asylum</option><option>Student</option></select>
-    <button class='btn primary' onclick='next()'>Continue</button>
-    <button class='back' onclick='back()'>← Go back</button>
-  </div>`;
- }
- 
- else{
-  el.innerHTML=`<div class='card'>
-    <div class='icon'>✅</div>
-    <h3>You may be eligible for AngelBox support</h3>
-    <p>Based on your answers, your application meets our initial eligibility criteria.</p>
-    <p><b>Please scroll down the page to start your application.</b></p>
-    <button class='back' onclick='reset()'>Start again</button>
-  </div>`;
- }
+function safeStep(n) {
+  if (typeof n !== "number" && typeof n !== "string") return 0;
+  return n;
+}
+
+function render() {
+  const el = document.getElementById("app");
+  if (!el) return;
+
+  step = safeStep(step);
+
+  try {
+
+    // ✅ FAIL STATES
+    if (step === "fail") {
+      el.innerHTML = `
+        <div class="card">
+          <div class="icon">⚠️</div>
+          <h3>Something went wrong</h3>
+          <p>Please restart the checker.</p>
+          <button class="back" onclick="reset()">Start again</button>
+        </div>`;
+      return;
+    }
+
+    // ✅ STEP 0
+    if (step === 0) {
+      el.innerHTML = `
+        <div class="card">
+          <p>Which London borough do you live in?</p>
+
+          <select id="borough">
+            <option value="">Select borough</option>
+            <option>Camden</option>
+            <option>Westminster</option>
+            <option>Ealing</option>
+          </select>
+
+          <button class="btn primary" onclick="nextBorough()">Continue</button>
+        </div>`;
+      return;
+    }
+
+    // ✅ STEP 1
+    if (step === 1) {
+      el.innerHTML = `
+        <div class="card">
+          <p>What is your residency status?</p>
+
+          <select id="residency">
+            <option value="">Select</option>
+            <option value="uk">UK / ILR</option>
+            <option value="asylum">Asylum seeker</option>
+            <option value="student">Student visa</option>
+          </select>
+
+          <button class="btn primary" onclick="nextResidency()">Continue</button>
+          <button class="back" onclick="back()">← Go back</button>
+        </div>`;
+      return;
+    }
+
+    // ✅ STEP 2 (SUCCESS TEST)
+    if (step === 2) {
+      el.innerHTML = `
+        <div class="card">
+          <div class="icon">✅</div>
+
+          <h3>You may be eligible for AngelBox support</h3>
+
+          <p>
+            Based on your answers, your application meets the initial criteria.
+          </p>
+
+          <p style="font-weight:600;">
+            Please scroll down the page to start your application.
+          </p>
+
+          <button class="back" onclick="reset()">Start again</button>
+        </div>`;
+      return;
+    }
+
+  } catch (err) {
+    console.error(err);
+    step = "fail";
+    render();
+  }
+}
+
+// ✅ HANDLERS
+
+function nextBorough() {
+  const el = document.getElementById("borough");
+  if (!el) return;
+
+  if (!el.value) {
+    alert("Please select a borough");
+    return;
+  }
+
+  answers.borough = el.value;
+  step = 1;
+  render();
+}
+
+function nextResidency() {
+  const el = document.getElementById("residency");
+  if (!el) return;
+
+  if (!el.value) {
+    alert("Please select your residency");
+    return;
+  }
+
+  if (el.value === "student") {
+    step = "fail";
+  } else {
+    step = 2;
+  }
+
+  render();
+}
+
+function back() {
+  if (typeof step === "number" && step > 0) step--;
+  render();
+}
+
+function reset() {
+  step = 0;
+  answers = {};
+  render();
 }
 
 render();

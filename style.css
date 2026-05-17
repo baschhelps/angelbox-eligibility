@@ -1,4 +1,3 @@
-
 body {
   font-family: system-ui, -apple-system, sans-serif;
   background: #f9fafb;
@@ -7,99 +6,40 @@ body {
   color: #1f2937;
 }
 
-.container {
-  max-width: 560px;
-  margin: auto;
-}
+.container { max-width: 600px; margin: auto; }
 
-.header {
-  text-align: center;
-  margin-bottom: 20px;
-}
+.header { text-align: center; margin-bottom: 20px; }
 
-.header h1 {
-  font-size: 26px;
-  color: #1d4ed8;
-}
-
-.subtitle {
-  color: #6b7280;
-}
-
-/* Card */
 .card {
   background: white;
-  padding: 24px;
+  padding: 26px;
   border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
 
-/* Inputs */
-select, input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-}
-
-/* Buttons */
 .btn {
   width: 100%;
-  padding: 14px;
+  padding: 15px;
   margin-top: 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: none;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.primary {
-  background: #1d4ed8;
-  color: white;
-}
+.primary { background:#1d4ed8; color:white; }
+.secondary { background:#fff; border:2px solid #e5e7eb; }
 
-.secondary {
-  background: white;
-  border: 2px solid #e5e7eb;
-}
-
-/* Back */
 .back {
-  margin-top: 10px;
-  font-size: 14px;
-  background: none;
-  border: none;
-  color: #6b7280;
-}
-
-/* Progress */
-.progress-wrapper {
-  margin-bottom: 15px;
-}
-
-.progress-bar {
-  height: 6px;
-  background: #e5e7eb;
-  border-radius: 999px;
-}
-
-.progress-fill {
-  height: 6px;
-  background: #1d4ed8;
-}
-
-/* Messages */
-.reassurance {
-  font-size: 14px;
-  color: #6b7280;
-  margin-top: 8px;
-}
-
-.alert {
-  background: #fef2f2;
-  border-left: 4px solid #dc2626;
+  width: 100%;
+  margin-top: 18px;
   padding: 12px;
-  margin-top: 10px;
+  background: #f3f4f6;
+  border-radius: 10px;
 }
-``
+
+.progress-bar { height: 8px; background:#e5e7eb; border-radius:999px; }
+.progress-fill { height:8px; background:#1d4ed8; }
+
+.icon { font-size:42px; margin-bottom:10px; }
+.alert { background:#fef2f2; padding:10px; margin-top:10px; }

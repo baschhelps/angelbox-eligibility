@@ -1,25 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AngelBox Eligibility Checker</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+let step=0,answers={};
 
-<body>
-  <div class="container">
+function next(){step++;render();}
+function back(){step--;render();}
+function reset(){step=0;answers={};render();}
 
-    <div class="header">
-      <h1>Check if you can get support</h1>
-      <p class="subtitle">
-        Answer a few quick questions to see if your family may be eligible
-      </p>
-    </div>
+function render(){
+ const el=document.getElementById('app');
+ 
+ if(step===0){
+  el.innerHTML=`<div class='card'>
+    <p>Which borough do you live in?</p>
+    <select id='b'><option value=''>Select</option><option>Camden</option><option>Westminster</option></select>
+    <button class='btn primary' onclick='next()'>Continue</button>
+  </div>`;
+ }
+ 
+ else if(step===1){
+  el.innerHTML=`<div class='card'>
+    <p>What is your residency status?</p>
+    <select id='r'><option>UK</option><option>Asylum</option><option>Student</option></select>
+    <button class='btn primary' onclick='next()'>Continue</button>
+    <button class='back' onclick='back()'>← Go back</button>
+  </div>`;
+ }
+ 
+ else{
+  el.innerHTML=`<div class='card'>
+    <div class='icon'>✅</div>
+    <h3>You may be eligible for AngelBox support</h3>
+    <p>Based on your answers, your application meets our initial eligibility criteria.</p>
+    <p><b>Please scroll down the page to start your application.</b></p>
+    <button class='back' onclick='reset()'>Start again</button>
+  </div>`;
+ }
+}
 
-    <div id="app"></div>
-
-  </div>
-
-  <script src="app.js"></script>
-</body>
-</html>
+render();
